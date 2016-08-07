@@ -16,8 +16,17 @@ server:
           - application/javascript
 # PROFILES
 spring:
-    application.name: shardis-auth
-    profiles.active: prod
+  jpa:
+    hibernate:
+      # possible values: validate | update | create | create-drop
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost/masetti
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+  application.name: shardis-auth
+  profiles.active: prod
 # EUREKA
 eureka:
   instance:

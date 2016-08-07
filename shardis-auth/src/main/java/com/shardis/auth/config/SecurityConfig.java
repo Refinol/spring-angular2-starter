@@ -1,5 +1,6 @@
 package com.shardis.auth.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,14 +10,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Created by Tomasz Kucharzyk
+ * Created by herasimau on 07.08.16.
  */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true,securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    @Autowired
+    private UserDetailsService userDetailsService;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -29,14 +33,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests().anyRequest().authenticated();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .inMemoryAuthentication()
-            .withUser("admin")
-            .password("xxxxxx")
-            .roles("USER", "ADMIN");
+    @Autowired
+    public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder
+            .userDetailsService(this.userDetailsService)
+            .passwordEncoder(passwordEncoder());
     }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 
     @Override
     @Bean
